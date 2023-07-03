@@ -341,24 +341,6 @@ inline float rsq(float x) {
 }
 
 /**
- Uses SSE to implement rsq.
- @cite Nick nicolas@capens.net
- */
-inline float SSErsq(float x) {
-
-    #if defined(SSE) && defined(G3D_WIN32)
-        __asm {
-           movss xmm0, x
-           rsqrtss xmm0, xmm0
-           movss x, xmm0
-        }
-        return x;
-    #else
-        return 1.0f / sqrt(x);
-    #endif
-}
-
-/**
  Return the next power of 2 higher than the input
  If the input is already a power of 2, the output will be the same 
  as the input.
