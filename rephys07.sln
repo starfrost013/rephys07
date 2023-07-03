@@ -17,6 +17,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client", "Client\Client.vcx
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RenderLib", "Client\Rendering\RenderLib\RenderLib.vcxproj", "{1A096892-2846-404F-8C2B-FE048D4F5876}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RbxView", "Client\RbxView\RbxView.vcxproj", "{3CCBDBA6-E710-4A4E-B822-E864AE5E87EE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -81,6 +83,14 @@ Global
 		{1A096892-2846-404F-8C2B-FE048D4F5876}.Release|x64.Build.0 = Release|x64
 		{1A096892-2846-404F-8C2B-FE048D4F5876}.Release|x86.ActiveCfg = Release|Win32
 		{1A096892-2846-404F-8C2B-FE048D4F5876}.Release|x86.Build.0 = Release|Win32
+		{3CCBDBA6-E710-4A4E-B822-E864AE5E87EE}.Debug|x64.ActiveCfg = Debug|x64
+		{3CCBDBA6-E710-4A4E-B822-E864AE5E87EE}.Debug|x64.Build.0 = Debug|x64
+		{3CCBDBA6-E710-4A4E-B822-E864AE5E87EE}.Debug|x86.ActiveCfg = Debug|Win32
+		{3CCBDBA6-E710-4A4E-B822-E864AE5E87EE}.Debug|x86.Build.0 = Debug|Win32
+		{3CCBDBA6-E710-4A4E-B822-E864AE5E87EE}.Release|x64.ActiveCfg = Release|x64
+		{3CCBDBA6-E710-4A4E-B822-E864AE5E87EE}.Release|x64.Build.0 = Release|x64
+		{3CCBDBA6-E710-4A4E-B822-E864AE5E87EE}.Release|x86.ActiveCfg = Release|Win32
+		{3CCBDBA6-E710-4A4E-B822-E864AE5E87EE}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
