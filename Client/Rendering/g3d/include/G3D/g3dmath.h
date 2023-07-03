@@ -50,45 +50,6 @@
 
 namespace G3D {
 
-#ifdef _MSC_VER
-
-/**
-   Win32 implementation of the C99 fast rounding routines.
-   
-   @cite routines are
-   Copyright (C) 2001 Erik de Castro Lopo <erikd AT mega-nerd DOT com>
-   
-   Permission to use, copy, modify, distribute, and sell this file for any 
-   purpose is hereby granted without fee, provided that the above copyright 
-   and this permission notice appear in all copies.  No representations are
-   made about the suitability of this software for any purpose.  It is 
-   provided "as is" without express or implied warranty.
-*/
-
-__inline long int lrint (double flt) {
-    int intgr;
-
-    _asm {
-        fld flt
-        fistp intgr
-    };
-
-    return intgr;
-}
-
-__inline long int lrintf(float flt) {
-    int intgr;
-
-    _asm {
-        fld flt
-        fistp intgr
-    };
-
-    return intgr;
-}
-#endif
-
-
 
 const double fuzzyEpsilon = 0.00001;
 
