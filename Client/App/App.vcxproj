@@ -112,6 +112,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(SolutionDir)/Client/boost_1_34_1/src/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>

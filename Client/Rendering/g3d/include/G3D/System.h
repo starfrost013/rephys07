@@ -321,14 +321,10 @@ private:
 
         // Use the assembly instruction rdtsc, which gets the current
         // cycle count (since the process started) and puts it in edx:eax.
-        __asm
-            {
-                rdtsc;
-                mov timehi, edx;
-                mov timelo, eax;
-            }
 
-        return ((uint64)timehi << 32) + (uint64)timelo;
+        uint64 cycles = __rdtsc();
+
+        return cycles;
     }
 
 #elif (defined(G3D_LINUX) || defined(G3D_MINGW32))

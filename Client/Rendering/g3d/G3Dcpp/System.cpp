@@ -31,7 +31,8 @@
 
     #include <conio.h>
     #include <sys/timeb.h>
-#   include "G3D/RegistryUtil.h"
+    #include <intrin.h>
+#include "G3D/RegistryUtil.h"
 
 #elif defined(G3D_LINUX) 
 
@@ -281,7 +282,7 @@ void System::init() {
             (G3D_VER / 100) % 100);
     }
 
-    unsigned long eaxreg, ebxreg, ecxreg, edxreg;
+    unsigned int eaxreg, ebxreg, ecxreg, edxreg; // int - force 32-bit
     eaxreg = ebxreg = ecxreg = edxreg = 0;
  
     // First of all we check if the CPUID command is available
@@ -303,23 +304,18 @@ void System::init() {
         // We read the standard CPUID level 0x00000000 which should
         // be available on every x86 processor.  This fills out
         // a string with the processor vendor tag.
+
+        
         #ifdef _MSC_VER
-            __asm {
-                push eax
-                push ebx
-                push ecx
-                push edx
-                mov eax, 0
-                cpuid
-                mov eaxreg, eax
-                mov ebxreg, ebx
-                mov edxreg, edx
-                mov ecxreg, ecx
-                pop edx
-                pop ecx
-                pop ebx
-                pop eax
-            }
+            int cpuIdInfo[4];
+
+            __cpuid(cpuIdInfo, 0);
+
+            eaxreg = cpuIdInfo[0];
+            ebxreg = cpuIdInfo[1];
+            ecxreg = cpuIdInfo[2];
+            edxreg = cpuIdInfo[3];
+
         #elif defined(__GNUC__) && defined(i386)
             asm (
                 "movl $0, %%eax \n"
@@ -354,19 +350,13 @@ void System::init() {
 
         // Then we read the ext. CPUID level 0x80000000
         #ifdef _MSC_VER
-            __asm {
-                push eax
-                push ebx
-                push ecx
-                push edx
-                mov eax, 0x80000000
-                cpuid
-                mov eaxreg, eax
-                pop edx
-                pop ecx
-                pop ebx
-                pop eax
-            }
+            __cpuidex(cpuIdInfo, 0x80000000, 0x00);
+
+            eaxreg = cpuIdInfo[0];
+            ebxreg = cpuIdInfo[1];
+            ecxreg = cpuIdInfo[2];
+            edxreg = cpuIdInfo[3];
+
         #elif defined(__GNUC__) && defined(i386)
             asm (
                 "movl $0x80000000, %%eax \n"
@@ -413,7 +403,7 @@ void System::init() {
 
         SYSTEM_INFO systemInfo;
         GetSystemInfo(&systemInfo);
-        char* arch;
+        const char* arch;
         switch (systemInfo.wProcessorArchitecture) {
         case PROCESSOR_ARCHITECTURE_INTEL:
             arch = "Intel";
@@ -853,7 +843,7 @@ std::string System::currentProgramFilename() {
 
     #ifdef G3D_WIN32
     {
-        GetModuleFileName(NULL, filename, sizeof(filename));
+        GetModuleFileNameA(NULL, filename, sizeof(filename));
     } 
     #else
     {
