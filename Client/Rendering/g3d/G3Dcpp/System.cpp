@@ -511,57 +511,23 @@ void System::init() {
 
 
 void checkForCPUID() {
-    unsigned long bitChanged = 0;
 
-    // We've to check if we can toggle the flag register bit 21.
-    // If we can't the processor does not support the CPUID command.
-    
-#   ifdef _MSC_VER
-        __asm {
-                push eax
-                push ebx
-                pushfd
-                pushfd
-                pop   eax
-                mov   ebx, eax
-                xor   eax, 0x00200000 
-                push  eax
-                popfd
-                pushfd
-                pop   eax
-                popfd
-                xor   eax, ebx 
-                mov   bitChanged, eax
-                pop ebx
-                pop eax
-        }
+    // We are not going to be running on an Intel 486,
+    // so just dummy this out to check if we are on x86(64).
 
-#    elif defined(__GNUC__) && defined(i386)
-        // Linux
-        __asm__ (
-"        pushfl                      # Get original EFLAGS             \n"
-"        pushfl                                                        \n"
-"        popl    %%eax                                                 \n"
-"        movl    %%eax, %%ecx                                          \n"
-"        xorl    $0x200000, %%eax    # Flip ID bit in EFLAGS           \n"
-"        pushl   %%eax               # Save new EFLAGS value on stack  \n"
-"        popfl                       # Replace current EFLAGS value    \n"
-"        pushfl                      # Get new EFLAGS                  \n"
-"        popl    %%eax               # Store new EFLAGS in EAX         \n"
-"        popfl                                                         \n"
-"        xorl    %%ecx, %%eax        # Can not toggle ID bit,          \n"
-"        movl    %%eax, %0           # We have CPUID support           \n"
-        : "=m" (bitChanged)
-        : // No inputs
-        : "%eax", "%ecx"
-        );
+    _cpuID = false;
 
-#    else               
-       // Unknown architecture
-        _cpuID = false;
-#    endif
-
-    _cpuID = ((bitChanged) ? true : false);
+#ifdef _MSC_VER
+    #if defined(_M_IX86) || defined(_M_AMD64)
+        _cpuID = true;
+    #endif
+#elif defined(__GNUC__)
+    #if defined(i386) || defined(__amd64)
+        _cpuID = true;
+    #endif
+#else
+    _cpuID = false;
+#endif
 }
 
 
@@ -570,29 +536,19 @@ void getStandardProcessorExtensions() {
         return;
     }
 
-    unsigned long features;
+    unsigned int features;
+
+    int featuresRegs[4];
+
+    __cpuid(featuresRegs, 1);
+
+    features = featuresRegs[3];
 
     // Invoking CPUID with '1' in EAX fills out edx with a bit string.
     // The bits of this value indicate the presence or absence of 
     // useful processor features.
-    #ifdef _MSC_VER
-        // Windows
 
-            __asm {
-            push eax
-            push ebx
-            push ecx
-            push edx
-                    mov eax, 1
-                    cpuid
-                    mov features, edx
-            pop edx
-            pop ecx
-            pop ebx
-            pop eax
-            }
-
-    #elif defined(__GNUC__) && defined(i386)
+    #if defined(__GNUC__) && defined(i386)
         // Linux
         __asm__ (
                 "movl    $1, %%eax                                                 \n"
@@ -651,190 +607,12 @@ void getStandardProcessorExtensions() {
 
 #undef checkBit
 
-
-
-#if defined(SSE)
-
-// Copy in 128 bytes chunks, where each chunk contains 8*float32x4 = 8 * 4 * 4 bytes = 128 bytes
-//
-//
-void memcpySSE2(void* dst, const void* src, int nbytes) {
-    int remainingBytes = nbytes;
-
-    if (nbytes > 128) {
-
-        // Number of chunks
-        int N = nbytes / 128;
-
-        float* restrict d = (float*)dst;
-        const float* restrict s = (const float*)src;
-    
-        // Finish when the destination pointer has moved 8N elements 
-        float* stop = d + (N * 8 * 4);
-
-        while (d < stop) {
-            // Inner loop unrolled 8 times
-            const __m128 r0 = _mm_loadu_ps(s);
-            const __m128 r1 = _mm_loadu_ps(s + 4);
-            const __m128 r2 = _mm_loadu_ps(s + 8);
-            const __m128 r3 = _mm_loadu_ps(s + 12);
-            const __m128 r4 = _mm_loadu_ps(s + 16);
-            const __m128 r5 = _mm_loadu_ps(s + 20);
-            const __m128 r6 = _mm_loadu_ps(s + 24);
-            const __m128 r7 = _mm_loadu_ps(s + 28);
-
-            _mm_storeu_ps(d, r0);
-            _mm_storeu_ps(d + 4, r1);
-            _mm_storeu_ps(d + 8, r2);
-            _mm_storeu_ps(d + 12, r3);
-            _mm_storeu_ps(d + 16, r4);
-            _mm_storeu_ps(d + 20, r5);
-            _mm_storeu_ps(d + 24, r6);
-            _mm_storeu_ps(d + 28, r7);
-
-            s += 32;
-            d += 32;
-        }
-
-        remainingBytes -= N * 8 * 4 * 4; 
-    }
-
-    if (remainingBytes > 0) {
-        // Memcpy the rest
-        memcpy((uint8*)dst + (nbytes - remainingBytes), (const uint8*)src + (nbytes - remainingBytes), remainingBytes); 
-    }
-}
-#else
-
-    // Fall back to memcpy
-    void memcpySSE2(void *dst, const void *src, int nbytes) {
-        memcpy(dst, src, nbytes);
-    }
-
-#endif
-
-#if defined(G3D_WIN32) && defined(SSE)
-/** Michael Herf's fast memcpy */
-void memcpyMMX(void* dst, const void* src, int nbytes) {
-    int remainingBytes = nbytes;
-
-    if (nbytes > 64) {
-            _asm {
-                    mov esi, src 
-                    mov edi, dst 
-                    mov ecx, nbytes 
-                    shr ecx, 6 // 64 bytes per iteration 
-
-    loop1: 
-                    movq mm1,  0[ESI] // Read in source data 
-                    movq mm2,  8[ESI]
-                    movq mm3, 16[ESI]
-                    movq mm4, 24[ESI] 
-                    movq mm5, 32[ESI]
-                    movq mm6, 40[ESI]
-                    movq mm7, 48[ESI]
-                    movq mm0, 56[ESI]
-
-                    movntq  0[EDI], mm1 // Non-temporal stores 
-                    movntq  8[EDI], mm2 
-                    movntq 16[EDI], mm3 
-                    movntq 24[EDI], mm4 
-                    movntq 32[EDI], mm5 
-                    movntq 40[EDI], mm6 
-                    movntq 48[EDI], mm7 
-                    movntq 56[EDI], mm0 
-
-                    add esi, 64 
-                    add edi, 64 
-                    dec ecx 
-                    jnz loop1 
-
-                    emms
-            }
-            remainingBytes -= ((nbytes >> 6) << 6); 
-    }
-
-    if (remainingBytes > 0) {
-        // Memcpy the rest
-        memcpy((uint8*)dst + (nbytes - remainingBytes), (const uint8*)src + (nbytes - remainingBytes), remainingBytes); 
-    }
-}
-
-#else
-    // Fall back to memcpy
-    void memcpyMMX(void *dst, const void *src, int nbytes) {
-        memcpy(dst, src, nbytes);
-    }
-
-#endif
-
-
 void System::memcpy(void* dst, const void* src, size_t numBytes) {
-    if (System::hasSSE2() && System::hasMMX()) {
-        G3D::memcpyMMX(dst, src, numBytes);
-    } else if (System::hasSSE() && System::hasMMX()) {
-        G3D::memcpyMMX(dst, src, numBytes);
-    } else {
-        ::memcpy(dst, src, numBytes);
-    }
+    ::memcpy(dst, src, numBytes);
 }
-
-
-/** Michael Herf's fastest memset. n32 must be filled with the same
-    character repeated. */
-#if defined(G3D_WIN32) && defined(SSE)
-
-// On x86 processors, use MMX
-void memfill(void *dst, int n32, unsigned long i) {
-
-    int originalSize = i;
-    int bytesRemaining = i;
-
-    if (i > 16) {
-        
-        bytesRemaining = i % 16;
-        i -= bytesRemaining;
-                __asm {
-                        movq mm0, n32
-                        punpckldq mm0, mm0
-                        mov edi, dst
-
-                loopwrite:
-
-                        movntq 0[edi], mm0
-                        movntq 8[edi], mm0
-
-                        add edi, 16
-                        sub i, 16
-                        jg loopwrite
-
-                        emms
-                }
-    }
-
-    if (bytesRemaining > 0) {
-        ::memset((uint8*)dst + (originalSize - bytesRemaining), n32, bytesRemaining); 
-    }
-}
-
-#else
-
-// For non x86 processors, we fall back to the standard memset
-void memfill(void *dst, int n32, unsigned long i) {
-    ::memset(dst, n32, i);
-}
-
-#endif
-
 
 void System::memset(void* dst, uint8 value, size_t numBytes) {
-    if (System::hasSSE() && System::hasMMX()) {
-        uint32 v = value;
-        v = v + (v << 8) + (v << 16) + (v << 24); 
-        G3D::memfill(dst, v, numBytes);
-    } else {
-        ::memset(dst, value, numBytes);
-    }
+    ::memset(dst, value, numBytes);
 }
 
 
