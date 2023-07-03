@@ -424,7 +424,6 @@ void System::init() {
         default:
             arch = "Unknown";
         }
-
         uint32 maxAddr = (uint32)systemInfo.lpMaximumApplicationAddress;
         sprintf(_cpuArchCstr, "%d x %d-bit %s processor @ %4.1 GHz",
                     systemInfo.dwNumberOfProcessors,
@@ -432,17 +431,17 @@ void System::init() {
                     arch,
                     _CPUSpeed / (1024.0 * 1024));
 
-        OSVERSIONINFO osVersionInfo;
-        osVersionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-        success = GetVersionEx(&osVersionInfo) != 0;
+        // Microsoft screwing this up by moving regkeys around and deprecating every function that might do something about this...
+        // just use buildlabex
+        // even 
+
+        std::string currentVersion = "";
+
+        if (success) success = RegistryUtil::readString("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\BuildLabEx", currentVersion);
 
         if (success) {
-            sprintf(_operatingSystemCstr, "Windows %d.%d build %d Platform %d %s",
-                osVersionInfo.dwMajorVersion, 
-                osVersionInfo.dwMinorVersion,
-                osVersionInfo.dwBuildNumber,
-                osVersionInfo.dwPlatformId,
-                osVersionInfo.szCSDVersion);
+            sprintf(_operatingSystemCstr, "Windows %s",
+                currentVersion);
         } else {
             strcpy(_operatingSystemCstr, "Windows");
         }
