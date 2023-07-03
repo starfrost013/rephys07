@@ -70,35 +70,41 @@ static void createErrorMessage(
     std::string&        outMessage) {
 
     std::string le = "";
-    char* newline = "\n";
+
+#ifdef G3D_WIN32
+    const char* newline = "\n";
+#else
+    const char* newlnie = "\r\n";
+#endif
+
+
 
     #ifdef G3D_WIN32
-        newline = "\r\n";
-
+         
         // The last error value.  (Which is preserved across the call).
         DWORD lastErr = GetLastError();
     
         // The decoded message from FormatMessage
-        LPTSTR formatMsg = NULL;
+        LPSTR formatMsg = NULL;
 
         if (NULL == formatMsg) {
-            FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
+            FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER |
                           FORMAT_MESSAGE_IGNORE_INSERTS |
                           FORMAT_MESSAGE_FROM_SYSTEM,
                             NULL,
                             lastErr,
                             0,
-                            (LPTSTR)&formatMsg,
+                            formatMsg,
                             0,
                             NULL);
         }
 
         // Make sure the message got translated into something.
-        LPTSTR realLastErr;
+        LPSTR realLastErr;
         if (NULL != formatMsg) {
             realLastErr = formatMsg;
         } else {
-            realLastErr = _T("Last error code does not exist.");
+            realLastErr = "Last error code does not exist.";
         }
 
 		if (lastErr != 0) {
@@ -111,7 +117,7 @@ static void createErrorMessage(
         }
 
         char modulePath[MAX_PATH];
-        GetModuleFileName(NULL, modulePath, MAX_PATH);
+        GetModuleFileNameA(NULL, modulePath, MAX_PATH);
 
         const char* moduleName = strrchr(modulePath, '\\');
         outTitle = outTitle + string(" - ") + string(moduleName ? (moduleName + 1) : modulePath);
@@ -149,7 +155,7 @@ bool _handleDebugAssert_(
     const int cIgnoreAlways = 2;
     const int cAbort = 3;
 
-    static char* choices[] = {"Debug", "Ignore", "Ignore Always", "Exit"};
+    static const char* choices[] = {"Debug", "Ignore", "Ignore Always", "Exit"};
 
     // Log the error
     Log::common()->print(std::string("\n**************************\n\n") + dialogTitle + "\n" + dialogText);
@@ -209,7 +215,7 @@ bool _handleErrorCheck_(
     // Log the error
     Log::common()->print(std::string("\n**************************\n\n") + dialogTitle + "\n" + dialogText);
 
-    static char* choices[] = {"Ok"};
+    static const char* choices[] = {"Ok"};
 
     std::string m = 
         std::string("An internal error has occured in your program and it will now close.  Details about the error have been reported in \"") +

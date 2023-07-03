@@ -112,7 +112,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)/Client/boost_1_34_1/src/;$(SolutionDir)/Client/Rendering/g3d/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/Client/boost_1_34_1/src/;$(SolutionDir)/Client/Rendering/sdl-1.2.6/include;$(SolutionDir)/Client/Rendering/g3d/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>

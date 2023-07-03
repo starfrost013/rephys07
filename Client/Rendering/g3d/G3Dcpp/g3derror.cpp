@@ -33,11 +33,11 @@ ErrorConstant _utility_error(
 
     if (showPrompt) {
         if (strcmp(level, "Critical Error") == 0) {
-            char* choice[] = {"Quit"};
+            const char* choice[] = {"Quit"};
             prompt(level, message, (const char **)choice, 1);
             return QUIT_ERROR;
         } else {
-            char* choice[] = {"Ignore", "Quit"};
+            const char* choice[] = {"Ignore", "Quit"};
             if (prompt(level, message, (const char **)choice, 2) == 1) {
                 return QUIT_ERROR;
             }

@@ -441,7 +441,7 @@ void System::init() {
 
         if (success) {
             sprintf(_operatingSystemCstr, "Windows %s",
-                currentVersion);
+                currentVersion.c_str());
         } else {
             strcpy(_operatingSystemCstr, "Windows");
         }

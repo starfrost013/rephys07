@@ -156,7 +156,7 @@ Win32Window::Win32Window(const GWindow::Settings& s, bool creatingShareWindow)
     clientX = settings.x = startX;
     clientY = settings.y = startY;
     
-    HWND window = CreateWindow(G3DWndClass(), 
+    HWND window = CreateWindowA(G3DWndClass(), 
         name.c_str(),
         style,
         startX,
@@ -560,7 +560,7 @@ void Win32Window::getSettings(GWindow::Settings& s) const {
 void Win32Window::setCaption(const std::string& caption) {
 	if (_title != caption) {
 		_title = caption;
-		SetWindowText(window, _title.c_str());
+		SetWindowTextA(window, _title.c_str());
 	}
 }
 
@@ -880,7 +880,7 @@ void Win32Window::initWGL() {
 		0, 0, 0															// Layer Masks Ignored
 	};
 
-    HWND hWnd = CreateWindow("window", "", 0, 0, 0, 100, 100, NULL, NULL, GetModuleHandle(NULL), NULL);
+    HWND hWnd = CreateWindowA("window", "", 0, 0, 0, 100, 100, NULL, NULL, GetModuleHandle(NULL), NULL);
     debugAssert(hWnd);
 
     HDC  hDC  = GetDC(hWnd);

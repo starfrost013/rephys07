@@ -707,60 +707,12 @@ void MD2Model::getGeometry(const Pose& pose, MeshAlg::Geometry& out) const {
         debugAssert(frame1.vertexArray.size() * 3 == numFloats);
         debugAssert(normal1.size() * 3 == numFloats);
 
-        // Spread alpha across a vector
-        const __m128 alpha128 = _mm_set_ps(alpha, alpha, alpha, alpha);
-
         // Our goal:
         //   vI = vI + (v1 - vI) * alpha
         //   nI = nI + (n1 - nI) * alpha
-        __asm {
-            mov     ecx,  num128
-            movaps  xmm7, alpha128
 
-            // Set up source and destination registers
-            mov     edi, vI
-            mov     esi, v1
-
-            mov     edx, nI
-            mov     eax, n1
-
-        beginLoop:
-            // Load vI and nI
-            movaps  xmm0, [edi]
-            movaps  xmm2, [edx]
-
-            // Load v1 and n1
-            movaps  xmm1, [esi]
-            movaps  xmm3, [eax]
-
-            // Compute (v1 - v0) and (n1 - n0)
-            subps   xmm1, xmm0
-            subps   xmm3, xmm2
-
-            // Multiply each by alpha
-            mulps   xmm1, xmm7
-            mulps   xmm3, xmm7
-
-            // Add the totals to v0 and n0
-            addps   xmm0, xmm1
-            addps   xmm2, xmm3
-
-            // Store the results back in vI and nI
-            movaps  [edi], xmm0
-            movaps  [edx], xmm2
-
-            // Increment all pointers
-            add     edi, 16
-            add     esi, 16
-            add     edx, 16
-            add     eax, 16
-
-            dec     ecx
-            jnz     beginLoop
-        }
-       
         // The last few floats may have been missed by the previous loop.
-        for (int i = num128 * 4; i < numFloats; ++i) {
+        for (int i = 0; i < numFloats; ++i) {
             vI[i] = vI[i] + (v1[i] - vI[i]) * alpha;
             nI[i] = nI[i] + (n1[i] - nI[i]) * alpha;
         }
