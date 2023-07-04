@@ -173,7 +173,7 @@ Win32Window::Win32Window(const GWindow::Settings& s, bool creatingShareWindow)
     // Set early so windows messages have value
     this->window = window;
 
-    SetWindowLong(window, GWL_USERDATA, (LONG)this);
+    SetWindowLong(window, GWLP_USERDATA, (LONG)this);
 
     if (s.visible) {
         ShowWindow(window, SW_SHOW);
@@ -542,7 +542,7 @@ Win32Window::~Win32Window() {
 	}
 
 	if (createdWindow) {
-        SetWindowLong(window, GWL_USERDATA, (LONG)NULL);
+        SetWindowLong(window, GWLP_USERDATA, (LONG)NULL);
 		close();
 	}
 
@@ -840,8 +840,8 @@ void Win32Window::initWGL() {
     }
     wglInitialized = true;
 
-    std::string name = "G3D";
-    WNDCLASS window_class;
+    const char* name = "G3D";
+    WNDCLASSA window_class;
     
     window_class.style         = CS_HREDRAW | CS_VREDRAW;
     window_class.lpfnWndProc   = _internal::window_proc;
@@ -851,10 +851,10 @@ void Win32Window::initWGL() {
     window_class.hIcon         = LoadIcon(NULL, IDI_APPLICATION); 
     window_class.hCursor       = LoadCursor(NULL, IDC_ARROW);
     window_class.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
-    window_class.lpszMenuName  = name.c_str();
+    window_class.lpszMenuName  = name;
     window_class.lpszClassName = "window"; 
     
-    int ret = RegisterClass(&window_class);
+    int ret = RegisterClassA(&window_class);
 	alwaysAssertM(ret, "Registration Failed");
 
     // Create some dummy pixel format.
@@ -931,8 +931,7 @@ void Win32Window::initWGL() {
     // Now destroy the dummy windows
     wglDeleteContext(hRC);					
     hRC = 0;	
-	ReleaseDC(hWnd, hDC);	
-	hWnd = 0;				
+	ReleaseDC(hWnd, hDC);		
 	DestroyWindow(hWnd);			
 	hWnd = 0;
 }
@@ -1331,7 +1330,7 @@ static LRESULT WINAPI window_proc(
     WPARAM              wparam,
     LPARAM              lparam) {
     
-    Win32Window* this_window = (Win32Window*)GetWindowLong(window, GWL_USERDATA);
+    Win32Window* this_window = (Win32Window*)GetWindowLong(window, GWLP_USERDATA);
     
     if (this_window != NULL) {
         switch (message) {
@@ -1389,7 +1388,7 @@ static const char* G3DWndClass() {
 
     if (g3dWindowClassName == NULL) {
         
-        WNDCLASS wndcls;
+        WNDCLASSA wndcls;
         
         wndcls.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS | CS_OWNDC;
         wndcls.lpfnWndProc = _internal::window_proc;
@@ -1401,7 +1400,7 @@ static const char* G3DWndClass() {
         wndcls.lpszMenuName = NULL;
         wndcls.lpszClassName = "G3DWindow";
         
-        if (!RegisterClass(&wndcls)) {
+        if (!RegisterClassA(&wndcls)) {
             Log::common()->printf("\n**** WARNING: could not create G3DWindow class ****\n");
             // error!  Return the default window class.
             return "window";

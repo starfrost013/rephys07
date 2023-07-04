@@ -410,9 +410,11 @@ void PNGAPI
 png_convert_from_time_t(png_timep ptime, time_t ttime)
 {
    struct tm *tbuf;
-
+   memset(&tbuf, 0x00, sizeof(struct tm));
+       
    png_debug(1, "in png_convert_from_time_t\n");
-   tbuf = gmtime(&ttime);
+   gmtime_s(&tbuf, &time);
+
    png_convert_from_struct_tm(ptime, tbuf);
 }
 #endif
@@ -508,11 +510,11 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
         char msg[80];
         if (user_png_ver)
         {
-          sprintf(msg, "Application was compiled with png.h from libpng-%.20s",
+          sprintf_s(msg, 80, "Application was compiled with png.h from libpng-%.20s",
              user_png_ver);
           png_warning(png_ptr, msg);
         }
-        sprintf(msg, "Application  is  running with png.c from libpng-%.20s",
+        sprintf_s(msg, 80, "Application  is  running with png.c from libpng-%.20s",
            png_libpng_ver);
         png_warning(png_ptr, msg);
 #endif
@@ -575,11 +577,11 @@ png_write_init_2(png_structp png_ptr, png_const_charp user_png_ver,
       png_ptr->warning_fn=NULL;
       if (user_png_ver)
       {
-        sprintf(msg, "Application was compiled with png.h from libpng-%.20s",
+        sprintf_s(msg, 80, "Application was compiled with png.h from libpng-%.20s",
            user_png_ver);
         png_warning(png_ptr, msg);
       }
-      sprintf(msg, "Application  is  running with png.c from libpng-%.20s",
+      sprintf_s(msg, 80, "Application  is  running with png.c from libpng-%.20s",
          png_libpng_ver);
       png_warning(png_ptr, msg);
    }

@@ -181,7 +181,7 @@ png_text_compress(png_structp png_ptr,
    {
 #if !defined(PNG_NO_STDIO) && !defined(_WIN32_WCE)
       char msg[50];
-      sprintf(msg, "Unknown compression type %d", compression);
+      sprintf_s(msg, 50, "Unknown compression type %d", compression);
       png_warning(png_ptr, msg);
 #else
       png_warning(png_ptr, "Unknown compression type");
@@ -1205,7 +1205,7 @@ png_check_keyword(png_structp png_ptr, png_charp key, png_charpp new_key)
 #if !defined(PNG_NO_STDIO) && !defined(_WIN32_WCE)
          char msg[40];
 
-         sprintf(msg, "invalid keyword character 0x%02X", *kp);
+         sprintf_s(msg, 40, "invalid keyword character 0x%02X", *kp);
          png_warning(png_ptr, msg);
 #else
          png_warning(png_ptr, "invalid character in keyword");
@@ -1574,8 +1574,8 @@ png_write_sCAL(png_structp png_ptr, int unit, double width,double height)
       WideCharToMultiByte(CP_ACP, 0, wc_buf, -1, hbuf, 32, NULL, NULL);
    }
 #else
-   sprintf(wbuf, "%12.12e", width);
-   sprintf(hbuf, "%12.12e", height);
+   sprintf_s(wbuf, 32, "%12.12e", width);
+   sprintf_s(hbuf, 32, "%12.12e", height);
 #endif
    total_len = 1 + png_strlen(wbuf)+1 + png_strlen(hbuf);
 

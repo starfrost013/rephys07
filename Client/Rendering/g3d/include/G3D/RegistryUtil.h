@@ -77,6 +77,8 @@ public:
     /** returns false if the key could not be written for any reason. */
     static bool writeString(const std::string& key, const std::string& valueData);
 
+private:
+    static HKEY getKeyFromString(const char* str, uint32 length);
 };
 
 } // namespace G3D

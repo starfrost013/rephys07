@@ -8,6 +8,8 @@
  All rights reserved.
 */
 
+#pragma once
+
 #include "G3D/platform.h"
 
 // This file is only used on Windows
@@ -28,10 +30,6 @@
 #endif
 
 namespace G3D {
-
-// static helpers
-static HKEY getKeyFromString(const char* str, size_t length);
-
 
 bool RegistryUtil::keyExists(const std::string& key) {
     size_t pos = key.find('\\', 0);
@@ -295,32 +293,40 @@ bool RegistryUtil::writeString(const std::string& key, const std::string& valueD
     return false;
 }
 
-
 // static helpers
 static HKEY getKeyFromString(const char* str, uint32 length) {
     debugAssert(str);
 
     if (str) {
-        if ( strncmp(str, "HKEY_CLASSES_ROOT", length) == 0 ) {
+        if (strncmp(str, "HKEY_CLASSES_ROOT", length) == 0) {
             return HKEY_CLASSES_ROOT;
-        } else if  ( strncmp(str, "HKEY_CURRENT_CONFIG", length) == 0 ) {
+        }
+        else if (strncmp(str, "HKEY_CURRENT_CONFIG", length) == 0) {
             return HKEY_CURRENT_CONFIG;
-        } else if  ( strncmp(str, "HKEY_CURRENT_USER", length) == 0 ) {
+        }
+        else if (strncmp(str, "HKEY_CURRENT_USER", length) == 0) {
             return HKEY_CURRENT_USER;
-        } else if  ( strncmp(str, "HKEY_LOCAL_MACHINE", length) == 0 ) {
+        }
+        else if (strncmp(str, "HKEY_LOCAL_MACHINE", length) == 0) {
             return HKEY_LOCAL_MACHINE;
-        } else if  ( strncmp(str, "HKEY_PERFORMANCE_DATA", length) == 0 ) {
+        }
+        else if (strncmp(str, "HKEY_PERFORMANCE_DATA", length) == 0) {
             return HKEY_PERFORMANCE_DATA;
-        } else if  ( strncmp(str, "HKEY_PERFORMANCE_NLSTEXT", length) == 0 ) {
+        }
+        else if (strncmp(str, "HKEY_PERFORMANCE_NLSTEXT", length) == 0) {
             return HKEY_PERFORMANCE_NLSTEXT;
-        } else if  ( strncmp(str, "HKEY_PERFORMANCE_TEXT", length) == 0 ) {
+        }
+        else if (strncmp(str, "HKEY_PERFORMANCE_TEXT", length) == 0) {
             return HKEY_PERFORMANCE_TEXT;
-        } else if  ( strncmp(str, "HKEY_CLASSES_ROOT", length) == 0 ) {
+        }
+        else if (strncmp(str, "HKEY_CLASSES_ROOT", length) == 0) {
             return HKEY_CLASSES_ROOT;
-        } else {
+        }
+        else {
             return NULL;
         }
-    } else {
+    }
+    else {
         return NULL;
     }
 }
@@ -328,3 +334,5 @@ static HKEY getKeyFromString(const char* str, uint32 length) {
 } // namespace G3D
 
 #endif // G3D_WIN32
+
+

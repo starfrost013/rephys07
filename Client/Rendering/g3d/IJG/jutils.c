@@ -15,7 +15,6 @@
 #include "jinclude.h"
 #include "jpeglib.h"
 
-
 /*
  * jpeg_zigzag_order[i] is the zigzag-order position of the i'th element
  * of a DCT block read in natural order (left to right, top to bottom).
@@ -219,7 +218,11 @@ static int isFileGood(FILE* f) {
 
 
 FILE* _robustTmpfile() {
-    FILE* t = tmpfile();
+    FILE* t;
+	memset(&t, 0x00, sizeof(FILE));
+
+	tmpfile_s(&t);
+
 #ifdef _WIN32
 	char* n = NULL;
 #endif
@@ -230,56 +233,83 @@ FILE* _robustTmpfile() {
 	}
 
     /* tmpfile failed; try the tmpnam routine */
-    t = fopen(tmpnam(NULL), "w+");
-    if (isFileGood(t)) {
+	char* tmpnamBuf[256];
+	memset(&tmpnamBuf, 0x00, sizeof(tmpnamBuf) * 256);
+
+	tmpnam_s(&tmpnamBuf, name);
+
+	if (tmpnamBuf == NULL) return NULL;
+
+    errno_t curErrno = fopen_s(&t, tmpnamBuf, "w+");
+
+    if (isFileGood(t) 
+		&& curErrno == 0) {
 		return t;
 	}
 
     #ifdef _WIN32
 		n = _tempnam("c:/tmp/", "t");
+
         /* Try to create something in C:\tmp */
-        t = fopen(n, "w+");
-		if (isFileGood(t)) {
+        curErrno = fopen_s(&t, n, "w+");
+
+		if (isFileGood(t) 
+			&& curErrno == 0) {
 			return t;
 		}
 
         /* Try c:\temp */
 		n = _tempnam("c:/temp/", "t");
-        t = fopen(n, "w+");
-	    if (isFileGood(t)) {
+
+		curErrno = fopen_s(&t, n, "w+");
+
+	    if (isFileGood(t) 
+			&& curErrno == 0) {
 			return t;
 		}
 
         /* try the current directory */
+
 		n = _tempnam("./", "t");
-        t = fopen(n, "w+");
-		if (isFileGood(t)) {
+
+		curErrno = fopen_s(&t, n, "w+");
+
+		if (isFileGood(t) 
+			&& curErrno == 0) {
 			return t;
 		}
     #endif
 
     /* Try some hardcoded paths */
-    sprintf(name, "%s/tmp%d", "c:/tmp", rand());
-    t = fopen(name, "w+");
-    if (isFileGood(t)) {
+    sprintf_s(name, 256, "%s/tmp%d", "c:/tmp", rand());
+	curErrno = fopen_s(&t, name, "w+");
+
+    if (isFileGood(t) 
+		&& curErrno == 0) {
 		return t;
 	}
 
-    sprintf(name, "%s/tmp%d", "/tmp", rand());
-    t = fopen(name, "w+");
-    if (isFileGood(t)) {
+    sprintf_s(name, 256, "%s/tmp%d", "/tmp", rand());
+	curErrno = fopen_s(&t, name, "w+");
+
+    if (isFileGood(t) 
+		&& curErrno == 0) {
 		return t;
 	}
 
-    sprintf(name, "%s/tmp%d", "c:/temp", rand());
-    t = fopen(name, "w+");
-    if (isFileGood(t)) {
+    sprintf_s(name, 256, "%s/tmp%d", "c:/temp", rand());
+	curErrno = fopen_s(&t, name, "w+");
+
+    if (isFileGood(t) 
+		&& curErrno == 0) {
 		return t;
 	}
 
-    sprintf(name, "tmp%d", rand());
-    t = fopen(name, "w+");
-    if (isFileGood(t)) {
+    sprintf_s(name, 256, "tmp%d", rand());
+	curErrno = fopen_s(&t, name, "w+");
+
+    if (isFileGood(t) 
+		&& curErrno == 0) {
 		return t;
 	}
 

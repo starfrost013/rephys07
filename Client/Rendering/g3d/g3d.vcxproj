@@ -131,8 +131,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(SolutionDir)/Client/boost_1_34_1/src/;$(SolutionDir)/Client/Rendering/sdl-1.2.6/include;$(SolutionDir)/Client/Rendering/g3d/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>

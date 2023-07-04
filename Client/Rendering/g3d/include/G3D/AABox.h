@@ -105,7 +105,7 @@ public:
     /**
      Distance from corner(0) to the next corner along axis a.
      */
-    inline double extent(int a) const {
+    inline float extent(int a) const {
         debugAssert(a < 3);
         return hi[a] - lo[a];
     }

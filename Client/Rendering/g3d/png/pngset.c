@@ -660,7 +660,7 @@ png_set_iCCP(png_structp png_ptr, png_infop info_ptr,
       png_warning(png_ptr, "Insufficient memory to process iCCP chunk.");
       return;
    }
-   png_strcpy(new_iccp_name, name);
+   strcpy_s(new_iccp_name, 5, name);
    new_iccp_profile = (png_charp)png_malloc_warn(png_ptr, proflen);
    if (new_iccp_profile == NULL)
    {
@@ -942,7 +942,7 @@ png_set_sPLT(png_structp png_ptr,
         to->name = (png_charp)png_malloc(png_ptr,
             png_strlen(from->name) + 1);
         /* TODO: use png_malloc_warn */
-        png_strcpy(to->name, from->name);
+        strcpy_s(to->name, 5, from->name);
         to->entries = (png_sPLT_entryp)png_malloc(png_ptr,
             from->nentries * png_sizeof(png_sPLT_t));
         /* TODO: use png_malloc_warn */
@@ -991,7 +991,7 @@ png_set_unknown_chunks(png_structp png_ptr,
         png_unknown_chunkp to = np + info_ptr->unknown_chunks_num + i;
         png_unknown_chunkp from = unknowns + i;
 
-        png_strncpy((png_charp)to->name, (png_charp)from->name, 5);
+        strncpy_s((png_charp)to->name, 5, (png_charp)from->name, 5);
         to->data = (png_bytep)png_malloc_warn(png_ptr, from->size);
         if (to->data == NULL)
         {

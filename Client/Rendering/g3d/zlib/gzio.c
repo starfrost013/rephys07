@@ -128,7 +128,7 @@ local gzFile gz_open (path, mode, fd)
     if (s->path == NULL) {
         return destroy(s), (gzFile)Z_NULL;
     }
-    strcpy(s->path, path); /* do this early for debugging */
+    strcpy_s(s->path, strlen(path)+1, path); /* do this early for debugging */
 
     s->mode = '\0';
     do {
@@ -178,7 +178,13 @@ local gzFile gz_open (path, mode, fd)
     s->stream.avail_out = Z_BUFSIZE;
 
     errno = 0;
-    s->file = fd < 0 ? F_OPEN(path, fmode) : (FILE*)fdopen(fd, fmode);
+
+    if (fd < 0) {
+        s->file = (FILE*)fdopen(fd, fmode);
+    } else { //path
+        fopen_s(s->file, &path, fmode);
+    }
+
 
     if (s->file == NULL) {
         return destroy(s), (gzFile)Z_NULL;
@@ -223,7 +229,7 @@ gzFile ZEXPORT gzdopen (fd, mode)
     char name[46];      /* allow for up to 128-bit integers */
 
     if (fd < 0) return (gzFile)Z_NULL;
-    sprintf(name, "<fd:%d>", fd); /* for debugging */
+    sprintf_s(name, 46, "<fd:%d>", fd); /* for debugging */
 
     return gz_open (name, mode, fd);
 }
@@ -624,7 +630,7 @@ int ZEXPORTVA gzprintf (gzFile file, const char *format, /* args */ ...)
     va_end(va);
     len = strlen(buf);
 #  else
-    len = vsnprintf(buf, sizeof(buf), format, va);
+    len = vsnprintf(buf, Z_PRINTF_BUFSIZE, sizeof(buf), format, va);
     va_end(va);
 #  endif
 #endif
@@ -998,16 +1004,17 @@ const char * ZEXPORT gzerror (file, errnum)
     *errnum = s->z_err;
     if (*errnum == Z_OK) return (const char*)"";
 
-    m = (char*)(*errnum == Z_ERRNO ? zstrerror(errno) : s->stream.msg);
+    m = (char*)(*errnum == Z_ERRNO ? strerror_s(&m, 128, errnum) : s->stream.msg);
 
+    
     if (m == NULL || *m == '\0') m = (char*)ERR_MSG(s->z_err);
 
     TRYFREE(s->msg);
     s->msg = (char*)ALLOC(strlen(s->path) + strlen(m) + 3);
     if (s->msg == Z_NULL) return (const char*)ERR_MSG(Z_MEM_ERROR);
-    strcpy(s->msg, s->path);
-    strcat(s->msg, ": ");
-    strcat(s->msg, m);
+    strcpy_s(s->msg, strlen(s->path) + strlen(m) + 3, s->path);
+    strcat_s(s->msg, strlen(s->path) + strlen(m) + 3, ": ");
+    strcat_s(s->msg, strlen(s->path) + strlen(m) + 3, m);
     return (const char*)s->msg;
 }
 
