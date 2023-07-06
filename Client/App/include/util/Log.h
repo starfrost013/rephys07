@@ -18,11 +18,12 @@ namespace RBX
 		static void setLogProvider(ILogProvider* provider);
 		static std::string formatMem(unsigned int bytes);
 		static std::string formatTime(double time);
+		void timeStamp(bool includeDate);
 
 		enum Severity
 		{
-			Success = 0,
-			Yield = 1,
+			Information = 0,
+			Warning = 1,
 			Error = 2,
 
 		};
@@ -30,8 +31,9 @@ namespace RBX
 	private:
 		static ILogProvider* provider;
 
+		Severity worstSeverity;
 
 		std::string logFile;
-		std::ofstream* stream;
+		std::ofstream stream;
 	};
 };

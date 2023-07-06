@@ -1,4 +1,8 @@
 #pragma once
+#include <fstream>
+#include <windows.h>
+
+#include <util\Debug.h>
 #include <util\Log.h>
 
 using namespace RBX;
@@ -60,4 +64,61 @@ std::string Log::formatTime(double time)
 	}
 
 	sprintf_s(buffer, 64, format, displayTime);
+}
+
+void Log::writeEntry(Log::Severity severity, const char* message)
+{
+	_SYSTEMTIME systemTime;
+	char buffer[256]{};
+
+	const char* error = " Error:   ";
+	const char* warning = " Warning: ";
+	const char* information = "          ";
+
+	RBXASSERT(!Log::provider->provideLog());
+
+	GetLocalTime(&systemTime);
+
+	sprintf_s(buffer, 256, "%02u:%02u.%03u ", systemTime.wHour, systemTime.wMinute, systemTime.wMilliseconds);
+
+	stream.flush();
+
+	switch (severity)
+	{
+		case Log::Severity::Information:
+			RBXASSERT(!Log::provider->provideLog());
+			stream << error;
+			break;
+		case Log::Severity::Warning:
+			RBXASSERT(!Log::provider->provideLog());
+			stream << warning;
+			break;
+		case Log::Severity::Error:
+			RBXASSERT(!Log::provider->provideLog());
+			stream << information;
+			break;
+	}
+
+	stream << message;
+	stream << "\n";
+}
+
+void Log::timeStamp(bool includeDate)
+{
+	_SYSTEMTIME systemTime;
+	char s[256];
+
+	// get local time
+	GetLocalTime((LPSYSTEMTIME)&systemTime);
+
+	if (includeDate)
+	{
+		sprintf_s(s, 256, "%02u.%02u.%u ", systemTime.wYear, systemTime.wMonth, systemTime.wDay);
+		stream << s;
+	}
+
+	sprintf_s(s, 256, "%02u:%02u.%03u ", systemTime.wHour, systemTime.wMinute, systemTime.wSecond);
+	stream << s;
+
+	stream.flush();
 }

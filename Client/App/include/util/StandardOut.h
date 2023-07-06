@@ -20,6 +20,12 @@ namespace RBX
 		MessageType type;
 		std::string message;
 		time_t time;
+
+		StandardOutMessage(MessageType type, std::string message, time_t time)
+			:type(type), message(message), time(time)
+		{
+
+		}
 	};
 
 	class StandardOut : public boost::enable_shared_from_this<RBX::StandardOut>

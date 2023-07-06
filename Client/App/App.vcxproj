@@ -142,12 +142,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
+    <ClInclude Include="include\util\Debug.h" />
     <ClInclude Include="include\util\Declarations.h" />
     <ClInclude Include="include\util\Log.h" />
     <ClInclude Include="include\util\StandardOut.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="include\util\Debug.cpp" />
     <ClCompile Include="util\Log.cpp" />
     <ClCompile Include="util\StandardOut.cpp" />
   </ItemGroup>
