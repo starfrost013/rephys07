@@ -142,6 +142,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
+    <ClInclude Include="include\util\Declarations.h" />
     <ClInclude Include="include\util\Log.h" />
     <ClInclude Include="include\util\StandardOut.h" />
   </ItemGroup>
