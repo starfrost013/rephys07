@@ -17,22 +17,22 @@ std::string Log::formatMem(unsigned int bytes) // should take long in future rev
 	// can't match - sprintf deprecated
 	if (bytes < 1000)
 	{
-		sprintf_s(&buffer[4], 64, format, displayBytes);
+		sprintf_s(buffer, 64, format, displayBytes);
 	}
 	else if (bytes < 1000000)
 	{
 		format = "%dKB";
-		sprintf_s(&buffer[4], 64, format, displayBytes / 1000);
+		sprintf_s(buffer, 64, format, displayBytes / 1000);
 	}
 	else if (bytes < 1000000000)
 	{
 		format = "%dMB";
-		sprintf_s(&buffer[4], 64, format, displayBytes / 1000000);
+		sprintf_s(buffer, 64, format, displayBytes / 1000000);
 	}
 	else
 	{
 		format = "%dGB";
-		sprintf_s(&buffer[4], 64, format, displayBytes / 1000000000);
+		sprintf_s(buffer, 64, format, displayBytes / 1000000000);
 	}
 
 	return buffer;
@@ -47,7 +47,7 @@ std::string Log::formatTime(double time)
 
 	if (time == 0.0)
 	{
-		sprintf_s(&buffer[4], 64, format);
+		sprintf_s(buffer, 64, format);
 	}
 	else if (displayTime <= 0.1)
 	{
@@ -59,5 +59,5 @@ std::string Log::formatTime(double time)
 		format = "%.3gs";
 	}
 
-	sprintf_s(&buffer[4], 64, format, displayTime);
+	sprintf_s(buffer, 64, format, displayTime);
 }
